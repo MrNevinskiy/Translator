@@ -6,15 +6,13 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import androidx.lifecycle.Observer
+import com.example.core.view.base.BaseActivity
+import com.example.model.data.AppState
 import com.example.translator.R
-import com.example.translator.model.data.AppState
-import com.example.translator.model.data.DataModel
-import com.example.translator.untils.convertMeaningsToString
-import com.example.translator.untils.network.isOnline
-import com.example.translator.view.base.BaseActivity
+import com.example.translator.utils.convertMeaningsToString
 import com.example.translator.view.descriptionscreen.DescriptionActivity
-import com.example.translator.view.history.HistoryActivity
 import com.example.translator.view.main.adapter.MainAdapter
+import com.example.utils.network.isOnline
 import kotlinx.android.synthetic.main.activity_main.*
 import org.koin.android.viewmodel.ext.android.viewModel
 
@@ -32,13 +30,13 @@ class MainActivity : BaseActivity<AppState, MainInteractor>() {
         }
     private val onListItemClickListener: MainAdapter.OnListItemClickListener =
         object : MainAdapter.OnListItemClickListener {
-            override fun onItemClick(data: DataModel) {
+            override fun onItemClick(data: com.example.model.data.DataModel) {
                 startActivity(
                     DescriptionActivity.getIntent(
                         this@MainActivity,
                         data.text!!,
                         convertMeaningsToString(data.meanings!!),
-                        data.meanings[0].imageUrl
+                        data.meanings!![0].imageUrl
                     )
                 )
             }
@@ -62,7 +60,7 @@ class MainActivity : BaseActivity<AppState, MainInteractor>() {
         initViews()
     }
 
-    override fun setDataToAdapter(data: List<DataModel>) {
+    override fun setDataToAdapter(data: List<com.example.model.data.DataModel>) {
         adapter.setData(data)
     }
 
@@ -74,7 +72,7 @@ class MainActivity : BaseActivity<AppState, MainInteractor>() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             R.id.menu_history -> {
-                startActivity(Intent(this, HistoryActivity::class.java))
+                startActivity(Intent(this, com.example.historyscreen.view.history.HistoryActivity::class.java))
                 true
             }
             else -> super.onOptionsItemSelected(item)
@@ -87,7 +85,7 @@ class MainActivity : BaseActivity<AppState, MainInteractor>() {
         }
         val viewModel: MainViewModel by viewModel()
         model = viewModel
-        model.subscribe().observe(this@MainActivity, Observer<AppState> { renderData(it) })
+        model.subscribe().observe(this@MainActivity, Observer<com.example.model.data.AppState> { renderData(it) })
     }
 
     private fun initViews() {
