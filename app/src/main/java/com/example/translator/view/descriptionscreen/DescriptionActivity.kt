@@ -14,8 +14,8 @@ import com.bumptech.glide.request.RequestListener
 import com.bumptech.glide.request.RequestOptions
 import com.bumptech.glide.request.target.Target
 import com.example.translator.R
-import com.example.translator.untils.network.isOnline
-import com.example.translator.untils.ui.AlertDialogFragment
+import com.example.utils.network.isOnline
+import com.example.utils.ui.AlertDialogFragment
 import kotlinx.android.synthetic.main.activity_description.*
 
 
