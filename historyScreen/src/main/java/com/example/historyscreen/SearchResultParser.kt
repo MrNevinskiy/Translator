@@ -4,7 +4,6 @@ import com.example.model.data.AppState
 import com.example.model.data.DataModel
 import com.example.model.data.Meanings
 
-
 fun parseLocalSearchResults(data: AppState): AppState {
     return AppState.Success(mapResult(data, false))
 }
