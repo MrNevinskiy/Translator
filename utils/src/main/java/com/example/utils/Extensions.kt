@@ -1,3 +1,3 @@
-package com.example.translator.untils
+package com.example.utils
 
 fun String.Companion.getEmptyString(): String = ""

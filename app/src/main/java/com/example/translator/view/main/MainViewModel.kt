@@ -2,37 +2,40 @@ package com.example.translator.view.main
 
 import androidx.lifecycle.LiveData
 import com.example.core.viewmodel.BaseViewModel
+import com.example.model.data.AppState
 import com.example.translator.utils.parseOnlineSearchResults
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 class MainViewModel(private val interactor: MainInteractor) :
-    BaseViewModel<com.example.model.data.AppState>() {
+    BaseViewModel<AppState>() {
 
-    private val liveDataForViewToObserve: LiveData<com.example.model.data.AppState> = _mutableLiveData
+    private val liveDataForViewToObserve: LiveData<AppState> = _mutableLiveData
 
-    fun subscribe(): LiveData<com.example.model.data.AppState> {
+    fun subscribe(): LiveData<AppState> {
         return liveDataForViewToObserve
     }
 
     override fun getData(word: String, isOnline: Boolean) {
-        _mutableLiveData.value = com.example.model.data.AppState.Loading(null)
+        _mutableLiveData.value = AppState.Loading(null)
         cancelJob()
         viewModelCoroutineScope.launch { startInteractor(word, isOnline) }
     }
 
     //Doesn't have to use withContext for Retrofit call if you use .addCallAdapterFactory(CoroutineCallAdapterFactory()). The same goes for Room
-    private suspend fun startInteractor(word: String, isOnline: Boolean) = withContext(Dispatchers.IO) {
-        _mutableLiveData.postValue(parseOnlineSearchResults(interactor.getData(word, isOnline)))
-    }
+    private suspend fun startInteractor(word: String, isOnline: Boolean) =
+        withContext(Dispatchers.IO) {
+            _mutableLiveData.postValue(parseOnlineSearchResults(interactor.getData(word, isOnline)))
+        }
 
     override fun handleError(error: Throwable) {
-        _mutableLiveData.postValue(com.example.model.data.AppState.Error(error))
+        _mutableLiveData.postValue(AppState.Error(error))
     }
 
     override fun onCleared() {
-        _mutableLiveData.value = com.example.model.data.AppState.Success(null)
+        _mutableLiveData.value =
+            AppState.Success(null)//TODO Workaround. Set View to original state
         super.onCleared()
     }
 }

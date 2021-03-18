@@ -1,11 +1,29 @@
-package com.example.historyscreen
+package com.example.translator.utils
 
 import com.example.model.data.AppState
+import com.example.model.data.dto.SearchResultDto
 import com.example.model.data.userdata.DataModel
 import com.example.model.data.userdata.Meaning
+import com.example.model.data.userdata.TranslatedMeaning
 
-fun parseLocalSearchResults(data: AppState): AppState {
-    return AppState.Success(mapResult(data, false))
+fun mapSearchResultToResult(searchResults: List<SearchResultDto>): List<DataModel> {
+    return searchResults.map { searchResult ->
+        var meanings: List<Meaning> = listOf()
+        searchResult.meanings?.let {
+            //Check for null for HistoryScreen
+            meanings = it.map { meaningsDto ->
+                Meaning(
+                    TranslatedMeaning(meaningsDto?.translation?.translation ?: ""),
+                    meaningsDto?.imageUrl ?: ""
+                )
+            }
+        }
+        DataModel(searchResult.text ?: "", meanings)
+    }
+}
+
+fun parseOnlineSearchResults(data: AppState): AppState {
+    return AppState.Success(mapResult(data, true))
 }
 
 private fun mapResult(
@@ -45,19 +63,13 @@ private fun getSuccessResultData(
     }
 }
 
-private fun parseOnlineResult(searchDataModel: DataModel, newSearchDataModels: ArrayList<DataModel>) {
+private fun parseOnlineResult(
+    searchDataModel: DataModel,
+    newSearchDataModels: ArrayList<DataModel>
+) {
     if (searchDataModel.text.isNotBlank() && searchDataModel.meanings.isNotEmpty()) {
         val newMeanings = arrayListOf<Meaning>()
-        for (meaning in searchDataModel.meanings) {
-            if (meaning.translatedMeaning.translatedMeaning.isBlank()) {
-                newMeanings.add(
-                    Meaning(
-                        meaning.translatedMeaning,
-                        meaning.imageUrl
-                    )
-                )
-            }
-        }
+        newMeanings.addAll(searchDataModel.meanings.filter { it.translatedMeaning.translatedMeaning.isNotBlank() })
         if (newMeanings.isNotEmpty()) {
             newSearchDataModels.add(
                 DataModel(
@@ -67,4 +79,16 @@ private fun parseOnlineResult(searchDataModel: DataModel, newSearchDataModels: A
             )
         }
     }
+}
+
+fun convertMeaningsToSingleString(meanings: List<Meaning>): String {
+    var meaningsSeparatedByComma = String()
+    for ((index, meaning) in meanings.withIndex()) {
+        meaningsSeparatedByComma += if (index + 1 != meanings.size) {
+            String.format("%s%s", meaning.translatedMeaning.translatedMeaning, ", ")
+        } else {
+            meaning.translatedMeaning.translatedMeaning
+        }
+    }
+    return meaningsSeparatedByComma
 }
