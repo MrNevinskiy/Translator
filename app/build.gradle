@@ -23,6 +23,11 @@ android {
         sourceCompatibility Config.java_version
         targetCompatibility Config.java_version
     }
+    testOptions {
+        unitTests {
+            includeAndroidResources = true
+        }
+    }
 
     dynamicFeatures = [Modules.historyScreen]
 }
